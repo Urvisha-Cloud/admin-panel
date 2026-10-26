@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-main: #120E10;
+  --bg-card: #1C1518;
+
+  --bg-card-hover: #261D22;
+  --bg-surface: #2A1F25;
+  --bg-glass: rgba(28, 21, 24, 0.85);
+  --border-color: rgba(244, 114, 182, 0.35);
+  --border-color-hover: rgba(244, 114, 182, 0.65);
+  --border-active: #F472B6;
+  
+  --primary: #F472B6;
+  --primary-hover: #EC4899;
+  --primary-dark: #BE185D;
+  --primary-glow: rgba(244, 114, 182, 0.25);
+  --primary-light: #FDF2F8;
+
+  --text-main: #FFFFFF;
+  --text-muted: #A1989E;
+  --text-subtle: #6B6268;
+
+  --success: #10B981;
+  --success-bg: rgba(16, 185, 129, 0.12);
+  --warning: #F59E0B;
+  --warning-bg: rgba(245, 158, 11, 0.12);
+  --danger: #EF4444;
+  --danger-bg: rgba(239, 68, 68, 0.12);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --shadow-glow: 0 0 25px rgba(244, 114, 182, 0.2);
+  --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  @apply font-sans;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  height: 100vh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  @apply font-display font-semibold;
+  letter-spacing: -0.02em;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-surface);
+  border-radius: 4px;
+  border: 2px solid var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-dark);
+}
+
+button {
+  @apply font-sans cursor-pointer border-0 outline-none transition-all duration-200;
+}
+
+input, select, textarea {
+  @apply font-sans outline-none;
+}
+
+/* ── React Toastify overrides ── */
+:root {
+  --toastify-color-dark: var(--bg-card);
+  --toastify-text-color-dark: #FFFFFF;
+  --toastify-color-success: var(--success);
+  --toastify-color-error: var(--danger);
+  --toastify-color-warning: var(--warning);
+  --toastify-color-info: var(--primary);
+  --toastify-font-family: "Inter", -apple-system, sans-serif;
+  --toastify-border-radius: var(--radius-md);
+  --toastify-toast-min-height: 52px;
+}
+
+.Toastify__toast {
+  border: 1px solid rgba(244, 114, 182, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.Toastify__toast--success {
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.Toastify__toast--error {
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.Toastify__toast--warning {
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.Toastify__progress-bar--success {
+  background: var(--success);
+}
+
+.Toastify__progress-bar--error {
+  background: var(--danger);
+}
+
+/* ── Loader & Progress Animations ── */
+@keyframes loader-progress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-loader-progress {
+  animation: loader-progress 1.4s ease-in-out infinite;
+}
