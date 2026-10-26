@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { getCurrentAdmin, logoutAdmin } from "./services/auth.service";
+import {
+  ADMIN_AUTH_CHANGED_EVENT,
+  getCurrentAdmin,
+  logoutAdmin,
+  refreshCurrentAdmin,
+} from "./services/auth.service";
 import { AdminLayout } from "./layouts/AdminLayout";
 import { LoginPage } from "./pages/LoginPage";
 import { UserAuth } from "./types/homeCarousel.types";
@@ -27,6 +32,34 @@ export const App: React.FC = () => {
     }
     setIsInitializing(false);
   }, []);
+
+  // The role is saved at login; re-check it with the server so a promotion to Super Admin
+  // (or a demotion) shows the right tabs without logging out
+  const isSignedIn = Boolean(user);
+
+  useEffect(() => {
+    if (!isSignedIn) return;
+
+    const syncRole = async () => {
+      const latest = await refreshCurrentAdmin();
+      setUser((current) => {
+        if (!latest) return null;
+        if (current && current._id === latest._id && current.role === latest.role && current.name === latest.name) {
+          return current;
+        }
+        return latest;
+      });
+    };
+
+    syncRole();
+    window.addEventListener("focus", syncRole);
+    window.addEventListener(ADMIN_AUTH_CHANGED_EVENT, syncRole);
+    return () => {
+      window.removeEventListener("focus", syncRole);
+      window.removeEventListener(ADMIN_AUTH_CHANGED_EVENT, syncRole);
+    };
+    // Keyed on sign-in, not the id: older saved sessions have no _id, which kept this from ever running
+  }, [isSignedIn]);
 
   const handleLogout = () => {
     logoutAdmin();

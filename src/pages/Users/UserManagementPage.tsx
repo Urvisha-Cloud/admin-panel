@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import Dropdown from "../../components/common/Dropdown";
 import { ConfirmModal } from "../../components/ConfirmModal";
+import { getCurrentAdmin, notifyAdminAuthChanged } from "../../services/auth.service";
 import {
   useDeleteUserMutation,
   useReviewUserVerificationMutation,
@@ -58,6 +59,7 @@ const initialFilters = {
 };
 
 const statusColors: Record<string, { color: string; background: string }> = {
+  superAdmin: { color: "#C4B5FD", background: "rgba(196, 181, 253, 0.15)" },
   admin: { color: "#F472B6", background: "rgba(244, 114, 182, 0.15)" },
   user: { color: "var(--text-muted)", background: "rgba(255, 255, 255, 0.08)" },
   approved: { color: "var(--success)", background: "var(--success-bg)" },
@@ -70,7 +72,8 @@ const statusColors: Record<string, { color: string; background: string }> = {
   unblocked: { color: "var(--success)", background: "var(--success-bg)" },
 };
 
-const displayStatus = (value: string) => value.replace(/_/g, " ");
+// "pending_admin_approval" → "pending admin approval", "superAdmin" → "super Admin"
+const displayStatus = (value: string) => value.replace(/_/g, " ").replace(/([a-z])([A-Z])/g, "$1 $2");
 
 const StatusBadge: React.FC<{ value: string }> = ({ value }) => {
   const palette = statusColors[value] || { color: "var(--text-muted)", background: "rgba(255,255,255,0.08)" };
@@ -325,6 +328,8 @@ export const UserManagementPage: React.FC = () => {
   const [filters, setFilters] = useState(initialFilters);
   const [viewingUser, setViewingUser] = useState<AdminUser | null>(null);
   const [editingUser, setEditingUser] = useState<AdminUser | null>(null);
+  // Admins and Super Admins can both grant the Super Admin role
+  const canGrantSuperAdmin = ["admin", "superAdmin"].includes(getCurrentAdmin()?.role ?? "");
   const [deletingUser, setDeletingUser] = useState<AdminUser | null>(null);
   const [blockingUser, setBlockingUser] = useState<{ user: AdminUser; targetBlocked: boolean } | null>(null);
   const [rejectingUser, setRejectingUser] = useState<AdminUser | null>(null);
@@ -422,6 +427,8 @@ export const UserManagementPage: React.FC = () => {
     if (!editingUser || !editDraft) return;
     try {
       await updateMutation.mutateAsync({ id: editingUser.id, payload: editDraft });
+      // Editing your own account can change your role: refresh the sidebar tabs right away
+      if (editingUser.id === getCurrentAdmin()?._id) notifyAdminAuthChanged();
       setEditingUser(null);
       setEditDraft(null);
       toast.success("User updated successfully.");
@@ -487,7 +494,7 @@ export const UserManagementPage: React.FC = () => {
         <Dropdown value={filters.gender} onChange={(value) => updateFilter("gender", value)} options={[{ value: "all", label: "All genders" }, { value: "female", label: "Female" }, { value: "male", label: "Male" }, { value: "", label: "Not specified" }]} />
         <Dropdown value={filters.faceStatus} onChange={(value) => updateFilter("faceStatus", value)} options={[{ value: "all", label: "Face: all" }, { value: "pending", label: "Face: pending" }, { value: "submitted", label: "Face: submitted" }, { value: "approved", label: "Face: approved" }, { value: "rejected", label: "Face: rejected" }]} />
         <Dropdown value={filters.accountStatus} onChange={(value) => updateFilter("accountStatus", value)} options={[{ value: "all", label: "All accounts" }, { value: "approved", label: "Approved" }, { value: "pending_admin_approval", label: "Pending approval" }, { value: "pending_verification", label: "Pending verification" }, { value: "rejected", label: "Rejected" }]} />
-        <Dropdown value={filters.role} onChange={(value) => updateFilter("role", value)} options={[{ value: "all", label: "All roles" }, { value: "user", label: "Users" }, { value: "admin", label: "Admins" }]} />
+        <Dropdown value={filters.role} onChange={(value) => updateFilter("role", value)} options={[{ value: "all", label: "All roles" }, { value: "user", label: "Users" }, { value: "agency", label: "Agencies" }, { value: "admin", label: "Admins" }, { value: "superAdmin", label: "Super admins" }]} />
         <Dropdown value={filters.authProvider} onChange={(value) => updateFilter("authProvider", value)} options={[{ value: "all", label: "All providers" }, { value: "email", label: "Email" }, { value: "google", label: "Google" }, { value: "apple", label: "Apple" }]} />
       </div>
 
@@ -852,7 +859,7 @@ export const UserManagementPage: React.FC = () => {
             </label>
             <div className="grid grid-cols-2 gap-3">
               <Dropdown label="Gender" value={editDraft.gender} onChange={(value) => setEditDraft({ ...editDraft, gender: value as UserGender })} options={[{ value: "", label: "Not specified" }, { value: "female", label: "Female" }, { value: "male", label: "Male" }]} />
-              <Dropdown label="Role" value={editDraft.role} onChange={(value) => setEditDraft({ ...editDraft, role: value as UserRole })} options={[{ value: "user", label: "User" }, { value: "admin", label: "Admin" }]} />
+              <Dropdown label="Role" value={editDraft.role} onChange={(value) => setEditDraft({ ...editDraft, role: value as UserRole })} options={[{ value: "user", label: "User" }, { value: "agency", label: "Agency" }, { value: "admin", label: "Admin" }, ...(canGrantSuperAdmin || editingUser?.role === "superAdmin" ? [{ value: "superAdmin", label: "Super Admin" }] : [])]} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Dropdown label="Account access" value={editDraft.isBlocked ? "blocked" : "unblocked"} onChange={(value) => setEditDraft({ ...editDraft, isBlocked: value === "blocked" })} options={[{ value: "unblocked", label: "Unblocked (Normal access)" }, { value: "blocked", label: "Blocked (Restricted)" }]} />

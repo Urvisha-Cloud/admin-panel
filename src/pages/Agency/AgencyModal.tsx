@@ -91,6 +91,7 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
   if (!isOpen) return null;
 
   const personLimit = Math.max(Math.floor(Number(form.personCount)) || 0, 0);
+  // Not a hard cap: adding a member past the limit raises Person Count to match (same rule as the server)
   const isAtCapacity = personLimit > 0 && form.members.length >= personLimit;
 
   const handleAddMember = () => {
@@ -102,12 +103,19 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
     else if (email === form.email.trim().toLowerCase()) error = "The agency's own email cannot be a member";
     else if (form.members.includes(email)) error = `'${email}' is already added`;
     else if (personLimit < 1) error = "Set a valid Person Count first";
-    else if (isAtCapacity) error = `Person Count limit (${personLimit}) reached`;
 
     setErrors((prev) => ({ ...prev, members: error }));
     if (error) return;
 
-    setForm((prev) => ({ ...prev, members: [...prev.members, email] }));
+    setForm((prev) => {
+      const members = [...prev.members, email];
+      const limit = Math.floor(Number(prev.personCount)) || 0;
+      return {
+        ...prev,
+        members,
+        personCount: members.length > limit ? String(members.length) : prev.personCount,
+      };
+    });
     setMemberInput("");
   };
 
@@ -137,8 +145,6 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
     const personCountNum = Number(form.personCount);
     if (form.personCount === "" || isNaN(personCountNum) || personCountNum < 1) {
       nextErrors.personCount = "Person Count must be at least 1";
-    } else if (form.members.length > Math.floor(personCountNum)) {
-      nextErrors.members = `${form.members.length} members added but the limit is ${Math.floor(personCountNum)}. Remove some or raise the Person Count.`;
     }
 
     setErrors(nextErrors);
@@ -315,57 +321,54 @@ export const AgencyModal: React.FC<AgencyModalProps> = ({
                 </div>
                 <span
                   className={`shrink-0 rounded-full px-2.5 py-0.5 text-[0.7rem] font-semibold ${
-                    personLimit > 0 && form.members.length > personLimit
-                      ? "bg-red-500/15 text-red-400"
-                      : isAtCapacity
+                    isAtCapacity
                       ? "bg-emerald-500/15 text-emerald-400"
                       : "bg-[rgba(244,114,182,0.12)] text-admin-primary"
                   }`}
                 >
                   {form.members.length} / {personLimit || "–"}
-                  {isAtCapacity && form.members.length === personLimit ? " · Full" : ""}
+                  {isAtCapacity ? " · Full" : ""}
                 </span>
               </div>
 
               <div className="space-y-3 p-4">
-                {/* Add row, replaced by a note once the limit is reached */}
-                {isAtCapacity ? (
+                {/* Limit reached is only a note; adding more raises Person Count */}
+                {isAtCapacity && (
                   <div className="flex items-center gap-2 rounded-admin bg-emerald-500/10 px-3 py-2 text-[0.75rem] text-emerald-300">
                     <Users size={14} className="shrink-0" />
-                    <span>Limit reached. Increase Person Count to add more members.</span>
-                  </div>
-                ) : (
-                  <div>
-                    <div className="flex gap-2">
-                      <input
-                        type="email"
-                        value={memberInput}
-                        onChange={(e) => {
-                          setMemberInput(e.target.value);
-                          if (errors.members) setErrors((prev) => ({ ...prev, members: undefined }));
-                        }}
-                        onKeyDown={(e) => {
-                          // Enter adds the email instead of submitting the whole form
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            handleAddMember();
-                          }
-                        }}
-                        placeholder="Enter member email and press Enter"
-                        className={`${inputCls} ${errors.members ? "border-red-400" : ""}`}
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddMember}
-                        disabled={!memberInput.trim()}
-                        className="inline-flex shrink-0 items-center gap-1.5 rounded-admin bg-gradient-to-r from-[#F472B6] to-[#DB2777] px-3.5 text-xs font-semibold text-white hover:opacity-95 disabled:opacity-40 transition-opacity"
-                      >
-                        <UserPlus size={14} />
-                        <span>Add</span>
-                      </button>
-                    </div>
+                    <span>Person Count reached. Adding another member raises the limit automatically.</span>
                   </div>
                 )}
+                <div>
+                  <div className="flex gap-2">
+                    <input
+                      type="email"
+                      value={memberInput}
+                      onChange={(e) => {
+                        setMemberInput(e.target.value);
+                        if (errors.members) setErrors((prev) => ({ ...prev, members: undefined }));
+                      }}
+                      onKeyDown={(e) => {
+                        // Enter adds the email instead of submitting the whole form
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddMember();
+                        }
+                      }}
+                      placeholder="Enter member email and press Enter"
+                      className={`${inputCls} ${errors.members ? "border-red-400" : ""}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddMember}
+                      disabled={!memberInput.trim()}
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-admin bg-gradient-to-r from-[#F472B6] to-[#DB2777] px-3.5 text-xs font-semibold text-white hover:opacity-95 disabled:opacity-40 transition-opacity"
+                    >
+                      <UserPlus size={14} />
+                      <span>Add</span>
+                    </button>
+                  </div>
+                </div>
 
                 {errors.members && (
                   <div className="flex items-center gap-1 text-xs text-red-400">
