@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   X,
   Gift,
@@ -225,10 +226,11 @@ export const WeeklyBonusModal: React.FC<WeeklyBonusModalProps> = ({
     await onSubmit(payload);
   };
 
-  return (
+  // Portal to body so the overlay covers the whole viewport, including the header
+  return createPortal(
     <div
       onClick={onClose}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/65 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -521,7 +523,8 @@ export const WeeklyBonusModal: React.FC<WeeklyBonusModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { createPortal } from "react-dom";
 import { toast } from "react-toastify";
 import {
   AlertCircle,
@@ -92,8 +93,10 @@ const ModalShell: React.FC<{ title: string; onClose: () => void; children: React
   onClose,
   children,
   wide = false,
-}) => (
-  <div onClick={onClose} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-5">
+}) =>
+  // Portal to body so the overlay covers the whole viewport, including the header
+  createPortal(
+  <div onClick={onClose} className="fixed inset-0 z-[100] flex items-center justify-center p-5 bg-black/70 backdrop-blur-sm animate-fade-in">
     <div
       onClick={(event) => event.stopPropagation()}
       className={`max-h-[90vh] w-full overflow-y-auto rounded-admin-lg border border-[rgba(244,114,182,0.2)] bg-admin-card p-6 shadow-admin ${
@@ -108,7 +111,8 @@ const ModalShell: React.FC<{ title: string; onClose: () => void; children: React
       </div>
       {children}
     </div>
-  </div>
+  </div>,
+  document.body
 );
 
 const inputCls = "w-full rounded-admin border border-[rgba(244,114,182,0.2)] bg-admin-surface px-3 py-[10px] text-[0.88rem] text-white outline-none";
@@ -128,8 +132,8 @@ const ImagePreviewModal: React.FC<{
 
   const currentAngleInfo = angleDetails[preview.angle] || { title: "Face Scan", hint: "" };
 
-  return (
-    <div onClick={onClose} className="fixed inset-0 z-[110] flex items-center justify-center bg-black/5 p-4 backdrop-blur-sm">
+  return createPortal(
+    <div onClick={onClose} className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
       <div
         onClick={(e) => e.stopPropagation()}
         className="flex max-h-[92vh] w-full max-w-[580px] flex-col overflow-hidden rounded-admin-lg border border-[rgba(244,114,182,0.3)] bg-admin-card shadow-2xl"
@@ -229,7 +233,8 @@ const ImagePreviewModal: React.FC<{
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

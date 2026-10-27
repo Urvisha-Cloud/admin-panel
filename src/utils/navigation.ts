@@ -1,9 +1,5 @@
-// Minimal path-based routing on top of the History API (no "#" in URLs).
-// navigate() pushes a new path and notifies listeners; subscribers also hear back/forward.
+import { LOCATION_CHANGE_EVENT } from "../constants";
 
-const LOCATION_CHANGE_EVENT = "app:locationchange";
-
-// Old links used "#agency/..." — turn them into "/agency/..." once on load
 if (window.location.hash.startsWith("#")) {
   const legacyPath = window.location.hash.replace(/^#\/?/, "");
   if (legacyPath) {

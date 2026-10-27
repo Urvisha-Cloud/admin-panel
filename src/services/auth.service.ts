@@ -1,11 +1,11 @@
 import apiClient from "../api/client";
 import { UserAuth } from "../types/homeCarousel.types";
+import { ADMIN_AUTH_CHANGED_EVENT } from "../constants";
 
 export interface LoginResponse {
   success: boolean;
   message?: string;
   user: {
-    // /auth/login sends `id`; /admin/me sends `_id`
     _id?: string;
     id?: string;
     email: string;
@@ -50,17 +50,11 @@ export const logoutAdmin = (): void => {
   localStorage.removeItem("admin_user");
 };
 
-// Fired after the signed-in admin's own account is edited, so App re-reads the role
-export const ADMIN_AUTH_CHANGED_EVENT = "admin-auth-changed";
 
 export const notifyAdminAuthChanged = (): void => {
   window.dispatchEvent(new Event(ADMIN_AUTH_CHANGED_EVENT));
 };
 
-/**
- * Re-read the signed-in admin's role from the server and update the saved session.
- * Returns null (and clears the session) when the account is no longer an admin.
- */
 export const refreshCurrentAdmin = async (): Promise<UserAuth | null> => {
   const saved = getCurrentAdmin();
   if (!saved) return null;
@@ -72,7 +66,6 @@ export const refreshCurrentAdmin = async (): Promise<UserAuth | null> => {
       logoutAdmin();
       return null;
     }
-    // Also back-fills _id for sessions saved before login stored it correctly
     const updated: UserAuth = {
       ...saved,
       _id: user._id ?? user.id ?? saved._id,
@@ -83,7 +76,6 @@ export const refreshCurrentAdmin = async (): Promise<UserAuth | null> => {
     localStorage.setItem("admin_user", JSON.stringify(updated));
     return updated;
   } catch (error: any) {
-    // 403 = this account lost admin access; anything else (network, 5xx) keeps the saved session
     if (error?.response?.status === 403) {
       logoutAdmin();
       return null;

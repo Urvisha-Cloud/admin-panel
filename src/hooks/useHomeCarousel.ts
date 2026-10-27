@@ -12,8 +12,7 @@ import {
   UpdateCarouselPayload,
   ReorderCarouselPayload,
 } from "../types/homeCarousel.types";
-
-export const CAROUSEL_QUERY_KEY = ["home-carousel"];
+import { CAROUSEL_QUERY_KEY } from "../constants";
 
 export const useCarouselImagesQuery = (gender?: GenderType) => {
   return useQuery({

@@ -15,10 +15,7 @@ import {
   CreateAgencyPayload,
   UpdateAgencyPayload,
 } from "../types/agency.types";
-
-export const AGENCIES_QUERY_KEY = ["admin-agencies"];
-export const AGENCY_DETAIL_QUERY_KEY = ["admin-agency-detail"];
-export const AGENCY_WITHDRAWALS_QUERY_KEY = ["admin-agency-withdrawals"];
+import { AGENCIES_QUERY_KEY, AGENCY_DETAIL_QUERY_KEY, AGENCY_WITHDRAWALS_QUERY_KEY } from "../constants";
 
 export const useAgenciesQuery = (filters: AgencyListFilters) =>
   useQuery({

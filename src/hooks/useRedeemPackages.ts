@@ -13,8 +13,7 @@ import {
   RedeemPackageListFilters,
   UpdateRedeemPackagePayload,
 } from "../types/redeemPackage.types";
-
-export const REDEEM_PACKAGES_QUERY_KEY = ["admin-redeem-packages"];
+import { REDEEM_PACKAGES_QUERY_KEY } from "../constants";
 
 export const useUploadRedeemPackageImageMutation = () => {
   return useMutation({

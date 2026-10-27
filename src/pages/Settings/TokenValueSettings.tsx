@@ -2,6 +2,7 @@ import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { toast } from "react-toastify";
 import { AlertCircle, CheckCircle2, Coins, IndianRupee } from "lucide-react";
 import { getTokenValue, updateTokenValue } from "../../services/appSettings.service";
+import { TOKEN_PREVIEW_AMOUNTS } from "../../constants";
 
 export interface TokenValueSettingsHandle {
   save: () => Promise<void>;
@@ -12,8 +13,6 @@ interface TokenValueSettingsProps {
   onBusyChange?: (busy: boolean) => void;
 }
 
-// Starts at the minimum withdrawal (MIN_WITHDRAW_TOKENS in BE redeem.controller.js)
-const PREVIEW_AMOUNTS = [1000, 2000, 5000, 10000];
 
 const formatRupees = (amount: number) =>
   `₹${amount.toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
@@ -213,7 +212,7 @@ export const TokenValueSettings = forwardRef<TokenValueSettingsHandle, TokenValu
             <p className="mt-0.5 text-xs text-admin-muted">Minimum withdrawal is 1,000 tokens. Updates as you type.</p>
 
             <div className="mt-4 divide-y divide-[rgba(244,114,182,0.1)] rounded-admin border border-[rgba(244,114,182,0.12)]">
-              {PREVIEW_AMOUNTS.map((tokens) => (
+              {TOKEN_PREVIEW_AMOUNTS.map((tokens) => (
                 <div key={tokens} className="flex items-center justify-between px-4 py-2.5 text-sm">
                   <span className="flex items-center gap-2 text-admin-muted">
                     <Coins size={14} className="text-admin-primary" />

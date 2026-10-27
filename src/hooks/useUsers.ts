@@ -10,8 +10,7 @@ import {
   UpdateUserPayload,
   UserListFilters,
 } from "../types/user.types";
-
-export const USERS_QUERY_KEY = ["admin-users"];
+import { USERS_QUERY_KEY } from "../constants";
 
 export const useUsersQuery = (filters: UserListFilters) =>
   useQuery({

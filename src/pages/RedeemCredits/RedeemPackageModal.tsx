@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { X, CircleDollarSign, AlertCircle, Coins, DollarSign, Loader2 } from "lucide-react";
 import Dropdown from "../../components/common/Dropdown";
 import { ImageUpload } from "../../components/ImageUpload";
@@ -161,10 +162,11 @@ export const RedeemPackageModal: React.FC<RedeemPackageModalProps> = ({
     await onSubmit(payload);
   };
 
-  return (
+  // Portal to body so the overlay covers the whole viewport, including the header
+  return createPortal(
     <div
       onClick={onClose}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-5 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-5 bg-black/70 backdrop-blur-sm animate-fade-in"
     >
       {/* Modal Dialog */}
       <div
@@ -357,7 +359,8 @@ export const RedeemPackageModal: React.FC<RedeemPackageModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

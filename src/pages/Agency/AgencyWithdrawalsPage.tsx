@@ -10,12 +10,11 @@ import {
   ReceiptText,
 } from "lucide-react";
 import { useAgencyWithdrawalsQuery } from "../../hooks/useAgencies";
+import { PAGE_SIZE } from "../../constants";
 interface AgencyWithdrawalsPageProps {
   agencyId: string;
   onBack: () => void;
 }
-
-const PAGE_SIZE = 20;
 
 export const formatRupees = (amount: number) =>
   `₹${(Number(amount) || 0).toLocaleString("en-IN", {

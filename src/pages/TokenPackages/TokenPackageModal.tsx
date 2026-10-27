@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { X, Coins, AlertCircle } from "lucide-react";
 import Dropdown from "../../components/common/Dropdown";
 import {
@@ -158,10 +159,11 @@ export const TokenPackageModal: React.FC<TokenPackageModalProps> = ({
     await onSubmit(payload);
   };
 
-  return (
+  // Portal to body so the overlay covers the whole viewport, including the header
+  return createPortal(
     <div
       onClick={onClose}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-5 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-5 bg-black/70 backdrop-blur-sm animate-fade-in"
     >
       <div
         onClick={(e) => e.stopPropagation()}
@@ -390,7 +392,8 @@ export const TokenPackageModal: React.FC<TokenPackageModalProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

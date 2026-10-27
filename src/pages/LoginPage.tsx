@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import { MessageCircleHeart, Lock, Mail, AlertCircle, ArrowRight } from "lucide-react";
 import { loginAdmin } from "../services/auth.service";
 import { UserAuth } from "../types/homeCarousel.types";
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+import { EMAIL_REGEX } from "../constants";
 
 const getLoginErrorMessage = (err: any): string => {
   // No response at all: server down, wrong URL, CORS, or timeout

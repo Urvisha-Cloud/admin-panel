@@ -10,33 +10,22 @@ import { CustomerServicePage } from "../pages/CustomerService/CustomerServicePag
 import { RedeemCreditsPage } from "../pages/RedeemCredits/RedeemCreditsPage";
 import { SettingsPage } from "../pages/Settings/SettingsPage";
 import { AgencyPage } from "../pages/Agency/AgencyPage";
+import { ReferralsPage } from "../pages/Referrals/ReferralsPage";
 import { GlobalQueryProgress } from "../components/common/GlobalQueryProgress";
 import { UserAuth } from "../types/homeCarousel.types";
 import { getPathSegments, navigate, subscribeToLocation } from "../utils/navigation";
+import { DEFAULT_ADMIN_TAB, ADMIN_TABS } from "../constants";
 
 interface AdminLayoutProps {
   user: UserAuth | null;
   onLogout: () => void;
 }
 
-const DEFAULT_TAB = "dashboard";
-const TABS = [
-  "dashboard",
-  "home-carousel",
-  "users",
-  "agency",
-  "customer-service",
-  "token-packages",
-  "redeem-credits",
-  "bonus",
-  "settings",
-];
-
 // The active tab lives in the URL path (e.g. /agency) so it survives a page refresh.
 // Anything after the first segment is a sub-route owned by that page (e.g. /agency/withdrawals/<id>)
 const getTabFromPath = (): string => {
   const tab = getPathSegments()[0] ?? "";
-  return TABS.includes(tab) ? tab : DEFAULT_TAB;
+  return ADMIN_TABS.includes(tab) ? tab : DEFAULT_ADMIN_TAB;
 };
 
 export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, onLogout }) => {
@@ -81,6 +70,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, onLogout }) => {
             <HomeCarouselPage />
           ) : activeTab === "users" ? (
             <UserManagementPage />
+          ) : activeTab === "referrals" ? (
+            <ReferralsPage />
           ) : activeTab === "agency" && isSuperAdmin ? (
             <AgencyPage />
           ) : activeTab === "customer-service" ? (

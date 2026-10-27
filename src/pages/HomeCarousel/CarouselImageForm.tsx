@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { X, Save, AlertCircle } from "lucide-react";
 import { ImageUpload } from "../../components/ImageUpload";
 import { FemaleIcon, MaleIcon } from "../../components/GenderIcons";
@@ -108,8 +109,9 @@ export const CarouselImageForm: React.FC<CarouselImageFormProps> = ({
     }
   };
 
-  return (
-    <div onClick={onClose} className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-5">
+  // Portal to body so the overlay covers the whole viewport, including the header
+  return createPortal(
+    <div onClick={onClose} className="fixed inset-0 z-[100] flex items-center justify-center p-5 bg-black/70 backdrop-blur-sm animate-fade-in">
       <div onClick={(e) => e.stopPropagation()} className="flex max-h-[90vh] w-full max-w-[520px] flex-col gap-[18px] overflow-y-auto rounded-admin-lg border border-[rgba(244,114,182,0.2)] bg-admin-card p-6 shadow-admin">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -254,6 +256,7 @@ export const CarouselImageForm: React.FC<CarouselImageFormProps> = ({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };

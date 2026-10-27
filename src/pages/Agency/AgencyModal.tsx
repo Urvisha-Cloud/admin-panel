@@ -7,6 +7,7 @@ import {
   CreateAgencyPayload,
   UpdateAgencyPayload,
 } from "../../types/agency.types";
+import { EMAIL_REGEX } from "../../constants";
 
 interface AgencyModalProps {
   isOpen: boolean;
@@ -32,8 +33,6 @@ interface FormErrors {
   personCount?: string;
   members?: string;
 }
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const inputCls =
   "w-full rounded-admin border border-[rgba(244,114,182,0.2)] bg-admin-surface px-3 py-[10px] text-[0.88rem] text-white outline-none transition-colors focus:border-admin-primary placeholder:text-admin-subtle";

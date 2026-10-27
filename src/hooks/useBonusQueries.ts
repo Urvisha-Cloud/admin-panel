@@ -11,8 +11,7 @@ import {
   CreateWeeklyBonusPayload,
   UpdateWeeklyBonusPayload,
 } from "../types/bonus.types";
-
-export const WEEKLY_BONUS_QUERY_KEY = ["admin-weekly-bonuses"];
+import { WEEKLY_BONUS_QUERY_KEY } from "../constants";
 
 export const useWeeklyBonusesQuery = () =>
   useQuery({

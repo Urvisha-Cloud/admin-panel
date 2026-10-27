@@ -11,8 +11,7 @@ import {
   TokenPackageListFilters,
   UpdateTokenPackagePayload,
 } from "../types/tokenPackage.types";
-
-export const TOKEN_PACKAGES_QUERY_KEY = ["admin-token-packages"];
+import { TOKEN_PACKAGES_QUERY_KEY } from "../constants";
 
 export const useTokenPackagesQuery = (filters: TokenPackageListFilters) =>
   useQuery({

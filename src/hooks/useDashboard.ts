@@ -1,8 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardStats } from "../services/dashboard.service";
 import { DashboardData } from "../types/dashboard.types";
-
-export const DASHBOARD_QUERY_KEY = ["admin-dashboard"];
+import { DASHBOARD_QUERY_KEY } from "../constants";
 
 export const useDashboardQuery = () =>
   useQuery<DashboardData>({

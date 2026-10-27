@@ -11,6 +11,7 @@ import {
   CircleDollarSign,
   ChevronLeft,
   ChevronRight,
+  Share2,
 } from "lucide-react";
 import { UserAuth } from "../types/homeCarousel.types";
 
@@ -35,6 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "home-carousel", label: "Home Carousel", icon: Images },
     { id: "users", label: "Users", icon: Users },
+    { id: "referrals", label: "Referrals", icon: Share2 },
     ...(isSuperAdmin
       ? [{ id: "agency", label: "Agency", icon: Building2 }]
       : []),
