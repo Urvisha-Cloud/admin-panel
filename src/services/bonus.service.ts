@@ -6,17 +6,11 @@ import {
   BonusApiResponse,
 } from "../types/bonus.types";
 
-/**
- * Fetch all weekly bonuses configured in the admin panel
- */
 export const getWeeklyBonuses = async (): Promise<WeeklyBonus[]> => {
   const response = await apiClient.get<BonusApiResponse<WeeklyBonus[]>>("/admin/bonus");
   return response.data.data || [];
 };
 
-/**
- * Fetch a single weekly bonus by ID
- */
 export const getWeeklyBonusById = async (id: string): Promise<WeeklyBonus> => {
   const response = await apiClient.get<BonusApiResponse<WeeklyBonus>>(`/admin/bonus/${id}`);
   if (!response.data.data) {
@@ -25,9 +19,6 @@ export const getWeeklyBonusById = async (id: string): Promise<WeeklyBonus> => {
   return response.data.data;
 };
 
-/**
- * Create a new weekly bonus
- */
 export const createWeeklyBonus = async (
   payload: CreateWeeklyBonusPayload
 ): Promise<WeeklyBonus> => {
@@ -38,9 +29,6 @@ export const createWeeklyBonus = async (
   return response.data.data;
 };
 
-/**
- * Update an existing weekly bonus
- */
 export const updateWeeklyBonus = async (
   id: string,
   payload: UpdateWeeklyBonusPayload
@@ -52,16 +40,10 @@ export const updateWeeklyBonus = async (
   return response.data.data;
 };
 
-/**
- * Delete a weekly bonus configuration
- */
 export const deleteWeeklyBonus = async (id: string): Promise<void> => {
   await apiClient.delete(`/admin/bonus/${id}`);
 };
 
-/**
- * Upload a gift/reward image to S3 for a bonus day
- */
 export const uploadBonusImage = async (file: File): Promise<string> => {
   const formData = new FormData();
   formData.append("image", file);

@@ -8,9 +8,6 @@ import {
   GenderType,
 } from "../types/homeCarousel.types";
 
-/**
- * Fetch all carousel images, optionally filtered by target gender
- */
 export const getCarouselImages = async (gender?: GenderType): Promise<HomeCarouselImage[]> => {
   const params: Record<string, string> = {};
   if (gender) {
@@ -25,9 +22,6 @@ export const getCarouselImages = async (gender?: GenderType): Promise<HomeCarous
   return response.data.images || [];
 };
 
-/**
- * Upload a new carousel image with multipart/form-data
- */
 export const createCarouselImage = async (
   payload: CreateCarouselPayload
 ): Promise<HomeCarouselImage> => {
@@ -61,9 +55,6 @@ export const createCarouselImage = async (
   return response.data.image;
 };
 
-/**
- * Update an existing carousel image
- */
 export const updateCarouselImage = async (
   payload: UpdateCarouselPayload
 ): Promise<HomeCarouselImage> => {
@@ -101,16 +92,10 @@ export const updateCarouselImage = async (
   return response.data.image;
 };
 
-/**
- * Delete a carousel image
- */
 export const deleteCarouselImage = async (id: string): Promise<void> => {
   await apiClient.delete(`/admin/home-carousel/${id}`);
 };
 
-/**
- * Reorder carousel images
- */
 export const reorderCarouselImages = async (
   payload: ReorderCarouselPayload
 ): Promise<HomeCarouselImage[]> => {

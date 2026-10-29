@@ -21,8 +21,6 @@ interface AdminLayoutProps {
   onLogout: () => void;
 }
 
-// The active tab lives in the URL path (e.g. /agency) so it survives a page refresh.
-// Anything after the first segment is a sub-route owned by that page (e.g. /agency/withdrawals/<id>)
 const getTabFromPath = (): string => {
   const tab = getPathSegments()[0] ?? "";
   return ADMIN_TABS.includes(tab) ? tab : DEFAULT_ADMIN_TAB;

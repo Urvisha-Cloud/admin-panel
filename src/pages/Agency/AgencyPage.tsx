@@ -9,10 +9,10 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  ChevronDown,
+  Copy,
   Users,
   UserPlus,
-  Percent,
-  CalendarDays,
   Wallet,
 } from "lucide-react";
 import Dropdown from "../../components/common/Dropdown";
@@ -59,8 +59,10 @@ const formatDate = (dateStr: string) => {
   }
 };
 
-interface AgencyCardProps {
+interface AgencyRowProps {
   agency: Agency;
+  isExpanded: boolean;
+  onToggleExpand: (agency: Agency) => void;
   onEdit: (agency: Agency) => void;
   onDelete: (agency: Agency) => void;
   onToggleStatus: (agency: Agency) => void;
@@ -68,8 +70,12 @@ interface AgencyCardProps {
   onViewWithdrawals: (agency: Agency) => void;
 }
 
-const AgencyCard: React.FC<AgencyCardProps> = ({
+const TABLE_COLUMNS = 10;
+
+const AgencyRow: React.FC<AgencyRowProps> = ({
   agency,
+  isExpanded,
+  onToggleExpand,
   onEdit,
   onDelete,
   onToggleStatus,
@@ -83,157 +89,219 @@ const AgencyCard: React.FC<AgencyCardProps> = ({
   const earnings = agency.earnings;
 
   return (
-    <div className="flex flex-col rounded-admin-md border border-[rgba(244,114,182,0.16)] bg-admin-card transition-colors hover:border-[rgba(244,114,182,0.32)]">
-      {/* Header */}
-      <div className="flex items-start gap-3 p-5 pb-4">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <h3 className="truncate text-sm font-semibold text-white">{agency.name}</h3>
-            <span
-              className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[0.68rem] font-medium ${
-                isActive ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
-              }`}
-            >
-              <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-emerald-400" : "bg-red-400"}`} />
-              {isActive ? "Active" : "Inactive"}
+    <>
+      <tr className={`text-white/90 transition-colors hover:bg-admin-surface/40 ${isExpanded ? "bg-admin-surface/30" : ""}`}>
+        {/* Expand */}
+        <td className="w-10 py-3 pl-4 pr-0">
+          <button
+            type="button"
+            onClick={() => onToggleExpand(agency)}
+            title={isExpanded ? "Hide members" : "Show members"}
+            aria-expanded={isExpanded}
+            className="flex h-7 w-7 items-center justify-center rounded-admin text-admin-muted hover:bg-admin-surface hover:text-white transition-colors"
+          >
+            <ChevronDown size={15} className={`transition-transform ${isExpanded ? "rotate-180 text-admin-primary" : ""}`} />
+          </button>
+        </td>
+
+        {/* Agency */}
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[rgba(244,114,182,0.15)] text-xs font-bold uppercase text-admin-primary">
+              {agency.name.charAt(0)}
             </span>
+            <div className="min-w-0">
+              <p className="truncate font-semibold text-white">{agency.name}</p>
+              <p className="truncate text-[0.7rem] text-admin-muted">{agency.email}</p>
+            </div>
           </div>
-          <p className="mt-0.5 truncate text-xs text-admin-muted">{agency.email}</p>
-        </div>
-        <div className="flex shrink-0 items-center gap-1">
-          <button
-            type="button"
-            role="switch"
-            aria-checked={isActive}
-            aria-label={isActive ? "Deactivate agency" : "Activate agency"}
-            disabled={isTogglingStatus}
-            onClick={() => onToggleStatus(agency)}
-            title={isActive ? "Click to deactivate" : "Click to activate"}
-            className={`relative mr-1 inline-flex h-[18px] w-8 shrink-0 cursor-pointer items-center rounded-full p-[2px] transition-all duration-200 ease-in-out focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${
-              isActive ? "bg-admin-primary" : "bg-white/15 hover:bg-white/20"
+        </td>
+
+        {/* Status */}
+        <td className="px-4 py-3">
+          <span
+            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-[0.68rem] font-medium ${
+              isActive ? "bg-emerald-500/15 text-emerald-400" : "bg-red-500/15 text-red-400"
             }`}
-            style={
-              isActive
-                ? {
-                    background: "linear-gradient(135deg, #F472B6 0%, #DB2777 100%)",
-                    boxShadow: "0 0 10px rgba(244, 114, 182, 0.4)",
-                  }
-                : {}
-            }
           >
-            <span
-              aria-hidden="true"
-              className={`pointer-events-none inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
-                isActive ? "translate-x-3.5" : "translate-x-0"
+            <span className={`h-1.5 w-1.5 rounded-full ${isActive ? "bg-emerald-400" : "bg-red-400"}`} />
+            {isActive ? "Active" : "Inactive"}
+          </span>
+        </td>
+
+        {/* Commission */}
+        <td className="px-4 py-3 text-right font-semibold text-white">{agency.percentage}%</td>
+
+        {/* Members */}
+        <td className="px-4 py-3 text-right">
+          <span className="font-semibold text-white">{assigned}</span>
+          <span className="text-admin-subtle"> / {limit}</span>
+        </td>
+
+        {/* Earnings */}
+        <td className="whitespace-nowrap px-4 py-3 text-right font-semibold text-admin-primary">
+          {formatRupees(earnings?.agencyAmount ?? 0)}
+        </td>
+        <td className="whitespace-nowrap px-4 py-3 text-right font-semibold text-emerald-400">
+          {formatRupees(earnings?.memberAmount ?? 0)}
+        </td>
+
+        {/* Withdrawals */}
+        <td className="px-4 py-3 text-right">
+          <button
+            type="button"
+            onClick={() => onViewWithdrawals(agency)}
+            title="View agency & member withdrawals"
+            className="inline-flex items-center gap-1 whitespace-nowrap rounded-admin border border-[rgba(244,114,182,0.14)] px-2.5 py-1 text-[0.7rem] font-medium text-admin-muted hover:border-admin-primary hover:text-admin-primary transition-colors"
+          >
+            <Wallet size={12} />
+            {earnings?.withdrawalCount ?? 0}
+            <ChevronRight size={12} />
+          </button>
+        </td>
+
+        {/* Created */}
+        <td className="whitespace-nowrap px-4 py-3 text-admin-muted">{formatDate(agency.createdAt)}</td>
+
+        {/* Actions */}
+        <td className="px-4 py-3">
+          <div className="flex items-center justify-end gap-1">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={isActive}
+              aria-label={isActive ? "Deactivate agency" : "Activate agency"}
+              disabled={isTogglingStatus}
+              onClick={() => onToggleStatus(agency)}
+              title={isActive ? "Click to deactivate" : "Click to activate"}
+              className={`relative mr-1 inline-flex h-[18px] w-8 shrink-0 cursor-pointer items-center rounded-full p-[2px] transition-all duration-200 ease-in-out focus:outline-none disabled:cursor-not-allowed disabled:opacity-60 ${
+                isActive ? "bg-admin-primary" : "bg-white/15 hover:bg-white/20"
               }`}
-            />
-          </button>
-          <button
-            type="button"
-            onClick={() => onEdit(agency)}
-            title="Edit agency & members"
-            className="flex h-8 w-8 items-center justify-center rounded-admin text-admin-muted hover:bg-admin-surface hover:text-white transition-colors"
-          >
-            <Edit2 size={14} />
-          </button>
-          <button
-            type="button"
-            onClick={() => onDelete(agency)}
-            title="Delete agency"
-            className="flex h-8 w-8 items-center justify-center rounded-admin text-admin-muted hover:bg-red-500/15 hover:text-red-400 transition-colors"
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="mx-5 grid grid-cols-3 divide-x divide-[rgba(244,114,182,0.12)] rounded-admin bg-admin-surface/60">
-        <div className="px-3 py-2.5">
-          <p className="flex items-center gap-1 text-[0.65rem] font-medium uppercase tracking-wider text-admin-subtle">
-            <Percent size={11} /> Commission
-          </p>
-          <p className="mt-0.5 text-sm font-semibold text-white">{agency.percentage}%</p>
-        </div>
-        <div className="px-3 py-2.5">
-          <p className="flex items-center gap-1 text-[0.65rem] font-medium uppercase tracking-wider text-admin-subtle">
-            <Users size={11} /> Members
-          </p>
-          <p className="mt-0.5 text-sm font-semibold text-white">
-            {assigned}
-            <span className="font-normal text-admin-subtle"> / {limit}</span>
-          </p>
-        </div>
-        <div className="px-3 py-2.5">
-          <p className="flex items-center gap-1 text-[0.65rem] font-medium uppercase tracking-wider text-admin-subtle">
-            <CalendarDays size={11} /> Created
-          </p>
-          <p className="mt-0.5 truncate text-sm font-semibold text-white">{formatDate(agency.createdAt)}</p>
-        </div>
-      </div>
-
-      {/* Withdrawal earnings */}
-      <button
-        type="button"
-        onClick={() => onViewWithdrawals(agency)}
-        title="View agency & member withdrawals"
-        className="group mx-5 mt-3 flex items-center gap-3 rounded-admin border border-[rgba(244,114,182,0.14)] px-3 py-2.5 text-left hover:border-admin-primary hover:bg-[rgba(244,114,182,0.06)] transition-colors"
-      >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-admin bg-[rgba(244,114,182,0.15)] text-admin-primary">
-          <Wallet size={15} />
-        </span>
-        <div className="grid min-w-0 flex-1 grid-cols-2 gap-3">
-          <div className="min-w-0">
-            <p className="text-[0.65rem] font-medium uppercase tracking-wider text-admin-subtle">Agency earned</p>
-            <p className="truncate text-sm font-semibold text-admin-primary">
-              {formatRupees(earnings?.agencyAmount ?? 0)}
-            </p>
+              style={
+                isActive
+                  ? {
+                      background: "linear-gradient(135deg, #F472B6 0%, #DB2777 100%)",
+                      boxShadow: "0 0 10px rgba(244, 114, 182, 0.4)",
+                    }
+                  : {}
+              }
+            >
+              <span
+                aria-hidden="true"
+                className={`pointer-events-none inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
+                  isActive ? "translate-x-3.5" : "translate-x-0"
+                }`}
+              />
+            </button>
+            <button
+              type="button"
+              onClick={() => onEdit(agency)}
+              title="Edit agency & members"
+              className="flex h-8 w-8 items-center justify-center rounded-admin text-admin-muted hover:bg-admin-surface hover:text-white transition-colors"
+            >
+              <Edit2 size={14} />
+            </button>
+            <button
+              type="button"
+              onClick={() => onDelete(agency)}
+              title="Delete agency"
+              className="flex h-8 w-8 items-center justify-center rounded-admin text-admin-muted hover:bg-red-500/15 hover:text-red-400 transition-colors"
+            >
+              <Trash2 size={14} />
+            </button>
           </div>
-          <div className="min-w-0">
-            <p className="text-[0.65rem] font-medium uppercase tracking-wider text-admin-subtle">Paid to members</p>
-            <p className="truncate text-sm font-semibold text-emerald-400">
-              {formatRupees(earnings?.memberAmount ?? 0)}
-            </p>
-          </div>
-        </div>
-        <span className="flex shrink-0 items-center gap-0.5 text-[0.68rem] font-medium text-admin-muted group-hover:text-admin-primary">
-          {earnings?.withdrawalCount ?? 0} withdrawals <ChevronRight size={13} />
-        </span>
-      </button>
+        </td>
+      </tr>
 
-      {/* Members: full list, scrolls when long */}
-      <div className="flex flex-1 flex-col p-5 pt-4">
-        <p className="mb-2 text-[0.7rem] font-semibold uppercase tracking-wider text-admin-subtle">
-          Members ({members.length})
-        </p>
-        {members.length > 0 ? (
-          <ul className="max-h-44 space-y-1 overflow-y-auto pr-1">
-            {members.map((member) => (
-              <li
-                key={member}
-                className="flex items-center gap-2.5 rounded-admin px-2 py-1.5 hover:bg-admin-surface/60"
-              >
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[rgba(244,114,182,0.15)] text-[0.65rem] font-bold uppercase text-admin-primary">
-                  {member.charAt(0)}
-                </span>
-                <span className="truncate text-xs text-white/90" title={member}>
-                  {member}
-                </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <button
-            type="button"
-            onClick={() => onEdit(agency)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-admin border border-dashed border-[rgba(244,114,182,0.22)] px-3 py-4 text-xs text-admin-muted hover:border-admin-primary hover:text-admin-primary transition-colors"
-          >
-            <UserPlus size={14} />
-            <span>No members yet. Add members</span>
-          </button>
-        )}
-      </div>
-    </div>
+      {/* Expanded member list */}
+      {isExpanded && (
+        <tr className="bg-admin-surface/20">
+          <td colSpan={TABLE_COLUMNS} className="px-4 pb-4 pt-1">
+            <div className="ml-10 rounded-admin-md border border-[rgba(244,114,182,0.14)] bg-admin-card p-4">
+              {/* Header: title, capacity bar, manage button */}
+              <div className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-admin bg-[rgba(244,114,182,0.15)] text-admin-primary">
+                    <Users size={14} />
+                  </span>
+                  <p className="text-sm font-semibold text-white">Members</p>
+                  <span className="rounded-full bg-admin-surface px-2 py-0.5 text-[0.65rem] font-semibold text-admin-muted">
+                    {members.length}
+                  </span>
+                </div>
+
+                <div className="flex min-w-[180px] flex-1 items-center gap-3 sm:max-w-xs">
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-admin-surface">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-[#F472B6] to-[#DB2777]"
+                      style={{ width: `${Math.min(100, (assigned / limit) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="whitespace-nowrap text-[0.7rem] text-admin-muted">
+                    <span className="font-semibold text-white">{assigned}</span> / {limit} slots
+                    {assigned >= limit && <span className="ml-1.5 font-semibold text-amber-400">· Full</span>}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => onEdit(agency)}
+                  className="ml-auto inline-flex items-center gap-1.5 rounded-admin border border-[rgba(244,114,182,0.2)] px-3 py-1.5 text-[0.7rem] font-semibold text-admin-primary hover:bg-[rgba(244,114,182,0.08)] transition-colors"
+                >
+                  <UserPlus size={13} /> Manage members
+                </button>
+              </div>
+
+              {members.length > 0 ? (
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                  {members.map((member, index) => (
+                    <div
+                      key={member}
+                      className="group flex items-center gap-3 rounded-admin border border-[rgba(244,114,182,0.1)] bg-admin-surface/40 px-3 py-2.5 hover:border-[rgba(244,114,182,0.3)] hover:bg-admin-surface/70 transition-colors"
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(244,114,182,0.15)] text-xs font-bold uppercase text-admin-primary">
+                        {member.charAt(0)}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-xs font-semibold capitalize text-white" title={member}>
+                          {member.split("@")[0].replace(/[._]/g, " ")}
+                        </p>
+                        <p className="truncate text-[0.68rem] text-admin-muted" title={member}>
+                          {member}
+                        </p>
+                      </div>
+                      <span className="text-[0.65rem] font-medium text-admin-subtle group-hover:hidden">
+                        #{index + 1}
+                      </span>
+                      <button
+                        type="button"
+                        title="Copy email"
+                        onClick={() => {
+                          navigator.clipboard?.writeText(member);
+                          toast.success("Email copied.");
+                        }}
+                        className="hidden h-6 w-6 items-center justify-center rounded-admin text-admin-muted hover:bg-admin-card hover:text-admin-primary group-hover:flex"
+                      >
+                        <Copy size={12} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => onEdit(agency)}
+                  className="flex w-full items-center justify-center gap-2 rounded-admin border border-dashed border-[rgba(244,114,182,0.22)] px-3 py-3 text-xs text-admin-muted hover:border-admin-primary hover:text-admin-primary transition-colors"
+                >
+                  <UserPlus size={14} />
+                  <span>No members yet. Add members</span>
+                </button>
+              )}
+            </div>
+          </td>
+        </tr>
+      )}
+    </>
   );
 };
 
@@ -247,6 +315,7 @@ export const AgencyPage: React.FC = () => {
   const [isAgencyModalOpen, setIsAgencyModalOpen] = useState<boolean>(false);
   const [editingAgency, setEditingAgency] = useState<Agency | null>(null);
   const [deletingAgency, setDeletingAgency] = useState<Agency | null>(null);
+  const [expandedAgencyId, setExpandedAgencyId] = useState<string | null>(null);
   const [withdrawalsAgencyId, setWithdrawalsAgencyId] = useState<string | null>(getWithdrawalsIdFromPath);
 
   // The withdrawals page lives at /agency/withdrawals/<id> so it survives a refresh and back/forward
@@ -397,7 +466,7 @@ export const AgencyPage: React.FC = () => {
         </div>
       </div>
 
-      {/* ── Agency Cards ── */}
+      {/* ── Agency Table ── */}
       {isLoading ? (
         <div className="py-20 text-center text-sm text-admin-muted">
           <div className="mb-3 inline-block h-8 w-8 animate-spin rounded-full border-2 border-admin-primary border-t-transparent" />
@@ -433,22 +502,44 @@ export const AgencyPage: React.FC = () => {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 2xl:grid-cols-3">
-          {agencies.map((agency) => (
-            <AgencyCard
-              key={agency.id}
-              agency={agency}
-              onEdit={handleOpenEdit}
-              onDelete={setDeletingAgency}
-              onToggleStatus={handleToggleStatus}
-              isTogglingStatus={
-                updateMutation.isPending && updateMutation.variables?.id === agency.id
-              }
-              onViewWithdrawals={(item) => {
-                navigate(`/agency/withdrawals/${encodeURIComponent(item.id)}`);
-              }}
-            />
-          ))}
+        <div className="overflow-x-auto rounded-admin-md border border-[rgba(244,114,182,0.16)] bg-admin-card">
+          <table className="w-full min-w-[1080px] text-left text-xs">
+            <thead className="bg-admin-surface/60 text-[0.65rem] uppercase tracking-wider text-admin-muted">
+              <tr>
+                <th className="w-10 py-3 pl-4 pr-0" />
+                <th className="px-4 py-3 font-medium">Agency</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 text-right font-medium">Commission</th>
+                <th className="px-4 py-3 text-right font-medium">Members</th>
+                <th className="px-4 py-3 text-right font-medium">Agency earned</th>
+                <th className="px-4 py-3 text-right font-medium">Paid to members</th>
+                <th className="px-4 py-3 text-right font-medium">Withdrawals</th>
+                <th className="px-4 py-3 font-medium">Created</th>
+                <th className="px-4 py-3 text-right font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[rgba(244,114,182,0.08)]">
+              {agencies.map((agency) => (
+                <AgencyRow
+                  key={agency.id}
+                  agency={agency}
+                  isExpanded={expandedAgencyId === agency.id}
+                  onToggleExpand={(item) =>
+                    setExpandedAgencyId((prev) => (prev === item.id ? null : item.id))
+                  }
+                  onEdit={handleOpenEdit}
+                  onDelete={setDeletingAgency}
+                  onToggleStatus={handleToggleStatus}
+                  isTogglingStatus={
+                    updateMutation.isPending && updateMutation.variables?.id === agency.id
+                  }
+                  onViewWithdrawals={(item) => {
+                    navigate(`/agency/withdrawals/${encodeURIComponent(item.id)}`);
+                  }}
+                />
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
