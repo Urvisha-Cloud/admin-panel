@@ -11,6 +11,7 @@ import { RedeemCreditsPage } from "../pages/RedeemCredits/RedeemCreditsPage";
 import { SettingsPage } from "../pages/Settings/SettingsPage";
 import { AgencyPage } from "../pages/Agency/AgencyPage";
 import { ReferralsPage } from "../pages/Referrals/ReferralsPage";
+import { LevelsPage } from "../pages/Levels/LevelsPage";
 import { GlobalQueryProgress } from "../components/common/GlobalQueryProgress";
 import { UserAuth } from "../types/homeCarousel.types";
 import { getPathSegments, navigate, subscribeToLocation } from "../utils/navigation";
@@ -70,6 +71,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, onLogout }) => {
             <UserManagementPage />
           ) : activeTab === "referrals" ? (
             <ReferralsPage />
+          ) : activeTab === "levels" ? (
+            <LevelsPage isSuperAdmin={isSuperAdmin} />
           ) : activeTab === "agency" && isSuperAdmin ? (
             <AgencyPage />
           ) : activeTab === "customer-service" ? (

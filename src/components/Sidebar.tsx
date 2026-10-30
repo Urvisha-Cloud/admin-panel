@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Share2,
+  Award,
 } from "lucide-react";
 import { UserAuth } from "../types/homeCarousel.types";
 
@@ -37,6 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: "home-carousel", label: "Home Carousel", icon: Images },
     { id: "users", label: "Users", icon: Users },
     { id: "referrals", label: "Referrals", icon: Share2 },
+    { id: "levels", label: "Levels", icon: Award },
     ...(isSuperAdmin
       ? [{ id: "agency", label: "Agency", icon: Building2 }]
       : []),
