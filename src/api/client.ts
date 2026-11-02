@@ -22,7 +22,7 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     // A 401 from the login call means bad credentials, not an expired session
-    const isLoginRequest = error.config?.url?.includes("/auth/login");
+    const isLoginRequest = error.config?.url?.includes("/admin/login");
     if (error.response?.status === 401 && !isLoginRequest) {
       // Clear token on 401 unauthorized
       localStorage.removeItem("admin_token");

@@ -6,17 +6,16 @@ export interface LoginResponse {
   success: boolean;
   message?: string;
   user: {
-    _id?: string;
-    id?: string;
+    _id: string;
     email: string;
-    name?: string;
-    role: "admin" | "superAdmin" | "agency" | "user";
+    name: string;
+    role: "admin" | "superAdmin";
   };
   token: string;
 }
 
 export const loginAdmin = async (email: string, password: string): Promise<UserAuth> => {
-  const response = await apiClient.post<LoginResponse>("/auth/login", {
+  const response = await apiClient.post<LoginResponse>("/admin/login", {
     email,
     password,
   });
@@ -32,7 +31,7 @@ export const loginAdmin = async (email: string, password: string): Promise<UserA
   }
 
   const authData: UserAuth = {
-    _id: user._id ?? user.id ?? "",
+    _id: user._id,
     email: user.email,
     name: user.name,
     role: user.role,
@@ -68,7 +67,7 @@ export const refreshCurrentAdmin = async (): Promise<UserAuth | null> => {
     }
     const updated: UserAuth = {
       ...saved,
-      _id: user._id ?? user.id ?? saved._id,
+      _id: user._id ?? saved._id,
       email: user.email,
       name: user.name,
       role: user.role,

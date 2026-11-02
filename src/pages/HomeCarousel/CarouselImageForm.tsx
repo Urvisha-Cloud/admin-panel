@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { toast } from "react-toastify";
 import { X, Save, AlertCircle } from "lucide-react";
 import { ImageUpload } from "../../components/ImageUpload";
 import { FemaleIcon, MaleIcon } from "../../components/GenderIcons";
@@ -105,7 +106,7 @@ export const CarouselImageForm: React.FC<CarouselImageFormProps> = ({
     } catch (err: any) {
       const msg =
         err?.response?.data?.message || err?.message || "Failed to save carousel image.";
-      setErrorMessage(msg);
+      toast.error(msg, { position: "top-right" });
     }
   };
 
