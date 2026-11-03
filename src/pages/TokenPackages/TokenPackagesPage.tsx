@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
   Plus,
@@ -9,10 +9,15 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  ShoppingBag,
 } from "lucide-react";
+import { PAGE_SIZE } from "../../constants";
 import Dropdown from "../../components/common/Dropdown";
+import { ToggleSwitch } from "../../components/common/ToggleSwitch";
 import { ConfirmModal } from "../../components/ConfirmModal";
 import { TokenPackageModal } from "./TokenPackageModal";
+import { TokenPurchasesPage } from "../TokenPurchases/TokenPurchasesPage";
+import { getPathSegments, navigate, subscribeToLocation } from "../../utils/navigation";
 import {
   useCreateTokenPackageMutation,
   useDeleteTokenPackageMutation,
@@ -29,14 +34,23 @@ import {
 
 const initialFilters: TokenPackageListFilters = {
   page: 1,
-  limit: 10,
+  limit: PAGE_SIZE,
   search: "",
   gender: "all",
   isActive: "all",
 };
 
+const isPurchasesPath = (): boolean => {
+  const [tab, section] = getPathSegments();
+  return tab === "token-packages" && section === "purchases";
+};
+
 export const TokenPackagesPage: React.FC = () => {
   const [filters, setFilters] = useState<TokenPackageListFilters>(initialFilters);
+  const [showPurchases, setShowPurchases] = useState<boolean>(isPurchasesPath);
+
+  // Purchases live at /token-packages/purchases so they survive a refresh and back/forward
+  useEffect(() => subscribeToLocation(() => setShowPurchases(isPurchasesPath())), []);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [editingPackage, setEditingPackage] = useState<TokenPackage | null>(null);
   const [deletingPackage, setDeletingPackage] = useState<TokenPackage | null>(null);
@@ -132,6 +146,10 @@ export const TokenPackagesPage: React.FC = () => {
     }
   };
 
+  if (showPurchases) {
+    return <TokenPurchasesPage onBack={() => navigate("/token-packages")} />;
+  }
+
   return (
     <div className="flex flex-col gap-6">
       {/* ── Top Header Bar ── */}
@@ -145,17 +163,27 @@ export const TokenPackagesPage: React.FC = () => {
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={handleOpenAdd}
-          className="flex items-center justify-center gap-2 rounded-admin px-4 py-2.5 text-[0.88rem] font-semibold text-white shadow-[0_2px_12px_rgba(244,114,182,0.35)] transition-all duration-200 hover:opacity-95 active:scale-[0.98]"
-          style={{
-            background: "linear-gradient(135deg, #F472B6 0%, #DB2777 100%)",
-          }}
-        >
-          <Plus size={18} strokeWidth={2.4} />
-          <span>Add Token Package</span>
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <button
+            type="button"
+            onClick={() => navigate("/token-packages/purchases")}
+            className="flex items-center justify-center gap-2 rounded-admin border border-[rgba(244,114,182,0.35)] bg-[rgba(244,114,182,0.08)] px-4 py-2.5 text-[0.88rem] font-semibold text-admin-primary transition-all duration-200 hover:bg-[rgba(244,114,182,0.15)] active:scale-[0.98]"
+          >
+            <ShoppingBag size={17} strokeWidth={2.3} />
+            <span>Token Purchases</span>
+          </button>
+          <button
+            type="button"
+            onClick={handleOpenAdd}
+            className="flex items-center justify-center gap-2 rounded-admin px-4 py-2.5 text-[0.88rem] font-semibold text-white shadow-[0_2px_12px_rgba(244,114,182,0.35)] transition-all duration-200 hover:opacity-95 active:scale-[0.98]"
+            style={{
+              background: "linear-gradient(135deg, #F472B6 0%, #DB2777 100%)",
+            }}
+          >
+            <Plus size={18} strokeWidth={2.4} />
+            <span>Add Token Package</span>
+          </button>
+        </div>
       </div>
 
       {/* ── Search and Filter Controls ── */}
@@ -210,8 +238,8 @@ export const TokenPackagesPage: React.FC = () => {
                 <th className="px-5 py-3.5">Price</th>
                 <th className="px-5 py-3.5">Discount</th>
                 <th className="px-5 py-3.5">Label</th>
-                <th className="px-5 py-3.5">Status</th>
                 <th className="px-5 py-3.5">Created</th>
+                <th className="px-5 py-3.5">Status</th>
                 <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
@@ -321,41 +349,20 @@ export const TokenPackagesPage: React.FC = () => {
                       )}
                     </td>
 
-                    {/* Status Toggle Switch */}
-                    <td className="px-5 py-4">
-                      <div className="flex items-center gap-2.5">
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={pkg.isActive}
-                          onClick={() => handleToggleStatus(pkg)}
-                          title={pkg.isActive ? "Click to deactivate" : "Click to activate"}
-                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-all duration-200 ease-in-out focus:outline-none ${
-                            pkg.isActive ? "bg-admin-primary" : "bg-white/15 hover:bg-white/20"
-                          }`}
-                          style={
-                            pkg.isActive
-                              ? {
-                                  background: "linear-gradient(135deg, #F472B6 0%, #DB2777 100%)",
-                                  boxShadow: "0 0 10px rgba(244, 114, 182, 0.4)",
-                                }
-                              : {}
-                          }
-                        >
-                          <span
-                            aria-hidden="true"
-                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
-                              pkg.isActive ? "translate-x-5" : "translate-x-0"
-                            }`}
-                          />
-                        </button>
-                        
-                      </div>
-                    </td>
-
                     {/* Created Date */}
                     <td className="px-5 py-4 text-[0.8rem] text-admin-muted">
                       {formatDate(pkg.createdAt)}
+                    </td>
+
+                    {/* Status Toggle Switch */}
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-2.5">
+                        <ToggleSwitch
+                          checked={pkg.isActive}
+                          onChange={() => handleToggleStatus(pkg)}
+                          title={pkg.isActive ? "Click to deactivate" : "Click to activate"}
+                        />
+                      </div>
                     </td>
 
                     {/* Actions */}

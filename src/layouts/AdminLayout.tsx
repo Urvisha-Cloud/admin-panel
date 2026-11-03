@@ -12,6 +12,7 @@ import { SettingsPage } from "../pages/Settings/SettingsPage";
 import { AgencyPage } from "../pages/Agency/AgencyPage";
 import { ReferralsPage } from "../pages/Referrals/ReferralsPage";
 import { LevelsPage } from "../pages/Levels/LevelsPage";
+import { WithdrawalsPage } from "../pages/Withdrawals/WithdrawalsPage";
 import { GlobalQueryProgress } from "../components/common/GlobalQueryProgress";
 import { UserAuth } from "../types/homeCarousel.types";
 import { getPathSegments, navigate, subscribeToLocation } from "../utils/navigation";
@@ -61,7 +62,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, onLogout }) => {
 
       {/* Main Content Area on the right */}
       <div className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
-        <Header user={user} onLogout={onLogout} />
+        <Header user={user} activeTab={activeTab} onLogout={onLogout} />
         <main className="flex-1 overflow-y-auto px-5 py-6 sm:px-8 sm:py-8">
           {activeTab === "dashboard" ? (
             <DashboardPage onNavigateTab={(tab) => setActiveTab(tab)} />
@@ -75,6 +76,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ user, onLogout }) => {
             <LevelsPage isSuperAdmin={isSuperAdmin} />
           ) : activeTab === "agency" && isSuperAdmin ? (
             <AgencyPage />
+          ) : activeTab === "withdrawals" && isSuperAdmin ? (
+            <WithdrawalsPage />
           ) : activeTab === "customer-service" ? (
             <CustomerServicePage />
           ) : activeTab === "token-packages" ? (

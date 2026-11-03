@@ -1,60 +1,86 @@
 import React, { useState } from "react";
-import { LogOut, User as UserIcon, Bell } from "lucide-react";
+import { LogOut, Bell, LayoutDashboard } from "lucide-react";
 import { UserAuth } from "../types/homeCarousel.types";
 import { ConfirmModal } from "./ConfirmModal";
+import { findNavItem } from "./navSections";
 
 interface HeaderProps {
   user: UserAuth | null;
+  activeTab: string;
   onLogout: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
+const ROLE_LABELS: Record<string, string> = {
+  superAdmin: "Super admin",
+  admin: "Admin",
+};
+
+export const Header: React.FC<HeaderProps> = ({ user, activeTab, onLogout }) => {
   const [isConfirmOpen, setIsConfirmOpen] = useState<boolean>(false);
 
+  // Page icon, title and section follow the sidebar groups
+  const nav = findNavItem(activeTab);
+  const PageIcon = nav?.item.icon ?? LayoutDashboard;
+  const pageTitle = nav?.item.label ?? "Dashboard";
+  const sectionTitle = nav?.section ?? "Overview";
+
+  const email = user?.email || "admin";
+  const initial = email.charAt(0).toUpperCase();
+  const roleLabel = ROLE_LABELS[user?.role ?? ""] ?? "Admin";
+
   return (
-    <header className="flex h-[68px] shrink-0 items-center justify-between border-b border-[rgba(244,114,182,0.2)] bg-admin-card px-5 backdrop-blur-xl sm:px-8">
-      {/* Left Context / Status */}
-      <div className="flex items-center gap-3">
-        <div className="inline-flex items-center gap-2 rounded-full border border-[rgba(244,114,182,0.2)] bg-[rgba(244,114,182,0.08)] px-3 py-1 text-[0.78rem] font-semibold tracking-[0.02em] text-admin-primary">
-          <span className="h-1.5 w-1.5 rounded-full bg-admin-primary shadow-[0_0_6px_var(--primary)]" />
-          <span>ADMIN DASHBOARD</span>
+    <header className="flex h-[68px] shrink-0 items-center justify-between gap-4 border-b border-[rgba(244,114,182,0.2)] bg-admin-card px-5 backdrop-blur-xl sm:px-8">
+      {/* Left: current page icon, title and its sidebar section */}
+      <div className="flex min-w-0 items-center gap-3">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-[rgba(244,114,182,0.15)] text-admin-primary">
+          <PageIcon size={18} strokeWidth={2.2} />
+        </div>
+        <div className="min-w-0">
+          <h2 className="truncate text-[1rem] font-bold leading-tight tracking-[-0.01em] text-white">
+            {pageTitle}
+          </h2>
+          <p className="truncate text-[0.72rem] text-admin-subtle">{sectionTitle}</p>
         </div>
       </div>
 
-      {/* Right: User Pill, Notification Bell, Sign Out */}
-      <div className="flex items-center gap-3 sm:gap-3.5">
-        {/* User Account Pill */}
-        <div className="flex items-center gap-2.5 rounded-full border border-[rgba(244,114,182,0.2)] bg-admin-surface py-[5px] pl-[6px] pr-3">
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[rgba(244,114,182,0.2)] text-admin-primary">
-            <UserIcon size={15} />
-          </div>
-          <span className="text-[0.82rem] font-medium text-white">
-            {user?.email || "admin@reactapp.com"}
-          </span>
-          <span className="rounded-[10px] bg-[rgba(244,114,182,0.25)] px-[7px] py-[2px] text-[0.65rem] font-bold uppercase tracking-[0.04em] text-admin-primary">
-            {user?.role || "ADMIN"}
-          </span>
-        </div>
-
-        {/* Notification Bell */}
+      {/* Right: bell | user details | sign out — all visible, no dropdown */}
+      <div className="flex shrink-0 items-center gap-3">
         <button
           type="button"
           title="Notifications"
-          className="relative flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(244,114,182,0.2)] bg-admin-surface text-admin-muted transition-colors hover:border-[rgba(244,114,182,0.2)]-border-hover hover:text-white"
+          className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-admin-muted transition-colors hover:text-white"
         >
           <Bell size={17} />
-          <span className="absolute right-2 top-[7px] h-1.5 w-1.5 rounded-full bg-admin-primary shadow-[0_0_6px_var(--primary)]" />
+          <span className="absolute right-[9px] top-[8px] h-[7px] w-[7px] rounded-full border-[1.5px] border-admin-card bg-admin-primary" />
         </button>
 
-        {/* Sign Out Button */}
+        <div className="hidden h-7 w-px bg-white/10 sm:block" />
+
+        <div className="flex min-w-0 items-center gap-2.5">
+          {/* Same gradient + glow as the sidebar logo */}
+          <div
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[0.85rem] font-semibold text-white"
+            style={{
+              background: "linear-gradient(135deg, #F472B6 0%, #DB2777 100%)",
+              boxShadow: "0 0 16px rgba(244, 114, 182, 0.35)",
+            }}
+          >
+            {initial}
+          </div>
+          <div className="hidden min-w-0 sm:block">
+            <p className="max-w-[220px] truncate text-[0.82rem] font-medium leading-tight text-white">{email}</p>
+            <p className="text-[0.7rem] font-semibold text-admin-primary">{roleLabel}</p>
+          </div>
+        </div>
+
         <button
           type="button"
           onClick={() => setIsConfirmOpen(true)}
-          title="Sign Out"
-          className="flex items-center gap-1.5 rounded-admin border border-[rgba(244,114,182,0.2)] bg-transparent px-[14px] py-2 text-[0.85rem] font-medium text-admin-muted transition-all hover:border-red-500 hover:bg-[rgba(239,68,68,0.12)] hover:text-red-400"
+          title="Sign out"
+          aria-label="Sign out"
+          className="flex h-9 w-9 items-center justify-center rounded-full border border-[rgba(251,113,133,0.35)] bg-[rgba(251,113,133,0.08)] text-[#FB7185] transition-colors hover:bg-[rgba(251,113,133,0.18)]"
         >
-          <LogOut size={15} />
-          <span>Sign Out</span>
+          <LogOut size={16} />
         </button>
       </div>
 

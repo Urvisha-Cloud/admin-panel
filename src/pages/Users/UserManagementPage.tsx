@@ -16,6 +16,7 @@ import {
   Camera,
   Maximize2,
 } from "lucide-react";
+import { PAGE_SIZE } from "../../constants";
 import Dropdown from "../../components/common/Dropdown";
 import { ConfirmModal } from "../../components/ConfirmModal";
 import { getCurrentAdmin, notifyAdminAuthChanged } from "../../services/auth.service";
@@ -49,7 +50,7 @@ interface PhotoPreviewState {
 
 const initialFilters = {
   page: 1,
-  limit: 10,
+  limit: PAGE_SIZE,
   search: "",
   gender: "all" as UserGender | "all",
   role: "all" as UserRole | "all",

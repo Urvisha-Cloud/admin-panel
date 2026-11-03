@@ -83,7 +83,7 @@ export interface AgencyWithdrawal {
   totalAmount: number;
   memberAmount: number;
   agencyAmount: number;
-  status: "pending" | "paid" | "rejected";
+  status: "pending" | "processing" | "paid" | "failed" | "rejected";
   createdAt: string;
 }
 

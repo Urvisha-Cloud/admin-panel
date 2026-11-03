@@ -294,23 +294,35 @@ const LevelUsersTable: React.FC = () => {
         </div>
       )}
 
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <div className="relative w-full sm:w-72">
-          <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-admin-muted" />
+      {/* Toolbar — same layout and 44px height as the other admin pages */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-admin-subtle" />
           <input
             type="text"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
-            placeholder="Search name or email"
-            className={`${INPUT_CLASS} border-[rgba(244,114,182,0.2)] pl-9`}
+            placeholder="Search by name or email..."
+            className="h-11 w-full rounded-admin border border-[rgba(244,114,182,0.16)] bg-admin-card pl-9 pr-3 text-sm text-white outline-none transition-colors placeholder:text-admin-subtle focus:border-admin-primary"
           />
         </div>
-        <Dropdown
-          value={filter.gender}
-          onChange={(value) => setFilter((f) => ({ ...f, gender: value as LevelUsersFilter["gender"], page: 1 }))}
-          options={[{ value: "", label: "All genders" }, { value: "male", label: "Male" }, { value: "female", label: "Female" }]}
-          className="sm:w-40"
-        />
+        <div className="flex items-center gap-3">
+          <div className="w-full sm:w-44">
+            <Dropdown
+              value={filter.gender}
+              onChange={(value) => setFilter((f) => ({ ...f, gender: value as LevelUsersFilter["gender"], page: 1 }))}
+              options={[{ value: "", label: "All genders" }, { value: "male", label: "Male" }, { value: "female", label: "Female" }]}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            title="Refresh"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-admin border border-[rgba(244,114,182,0.16)] bg-admin-card text-admin-muted transition-colors hover:text-white"
+          >
+            <RefreshCw size={15} className={isFetching ? "animate-spin text-admin-primary" : ""} />
+          </button>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-admin border border-[rgba(244,114,182,0.12)]">

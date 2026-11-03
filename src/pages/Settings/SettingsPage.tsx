@@ -223,7 +223,9 @@ export const SettingsPage: React.FC = () => {
             type="button"
             onClick={handleHeaderSave}
             disabled={isHeaderBusy}
-            className="flex h-9 items-center gap-2 rounded-admin bg-admin-primary px-4 text-[0.8rem] font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="flex h-9 items-center gap-2 rounded-admin px-4 text-[0.8rem] font-semibold text-white shadow-[0_2px_12px_rgba(244,114,182,0.35)] transition-opacity hover:opacity-95 disabled:opacity-50"
+            // Same pink gradient as the other primary buttons ("Add Token Package")
+            style={{ background: "linear-gradient(135deg, #F472B6 0%, #DB2777 100%)" }}
           >
             <Save size={14} />
             <span>{!isTokenTab && isSaving ? "Saving..." : "Save Changes"}</span>

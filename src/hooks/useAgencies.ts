@@ -15,7 +15,7 @@ import {
   CreateAgencyPayload,
   UpdateAgencyPayload,
 } from "../types/agency.types";
-import { AGENCIES_QUERY_KEY, AGENCY_DETAIL_QUERY_KEY, AGENCY_WITHDRAWALS_QUERY_KEY } from "../constants";
+import { AGENCIES_QUERY_KEY, AGENCY_DETAIL_QUERY_KEY, AGENCY_WITHDRAWALS_QUERY_KEY, PAGE_SIZE } from "../constants";
 
 export const useAgenciesQuery = (filters: AgencyListFilters) =>
   useQuery({
@@ -31,7 +31,7 @@ export const useAgencyDetailQuery = (agencyId: string | null) =>
     enabled: Boolean(agencyId),
   });
 
-export const useAgencyWithdrawalsQuery = (agencyId: string | null, page: number, limit = 20) =>
+export const useAgencyWithdrawalsQuery = (agencyId: string | null, page: number, limit = PAGE_SIZE) =>
   useQuery({
     queryKey: [...AGENCY_WITHDRAWALS_QUERY_KEY, agencyId, page, limit],
     queryFn: () => getAgencyWithdrawals(agencyId as string, page, limit),

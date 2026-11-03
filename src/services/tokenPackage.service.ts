@@ -1,4 +1,5 @@
 import apiClient from "../api/client";
+import { PAGE_SIZE } from "../constants";
 import {
   CreateTokenPackagePayload,
   TokenPackage,
@@ -12,7 +13,7 @@ export const getTokenPackages = async (
 ): Promise<TokenPackageListResponse> => {
   const params: Record<string, string | number> = {
     page: filters?.page ?? 1,
-    limit: filters?.limit ?? 20,
+    limit: filters?.limit ?? PAGE_SIZE,
   };
 
   if (filters?.search?.trim()) params.search = filters.search.trim();

@@ -12,6 +12,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import Dropdown from "../../components/common/Dropdown";
+import { ToggleSwitch } from "../../components/common/ToggleSwitch";
 import { ConfirmModal } from "../../components/ConfirmModal";
 import { RedeemPackageModal } from "./RedeemPackageModal";
 import {
@@ -235,7 +236,7 @@ export const RedeemCreditsPage: React.FC = () => {
             </div>
             <div>
               <h2 className="text-[1.5rem] font-bold tracking-[-0.01em] text-white">
-                Redeem Credits
+                Gift Packages
               </h2>
               <p className="mt-0.5 text-[0.85rem] text-admin-muted">
                 Manage token to credit payout packages for direct instant redemption.
@@ -405,31 +406,11 @@ export const RedeemCreditsPage: React.FC = () => {
                     {/* Status Toggle Switch */}
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-2.5">
-                        <button
-                          type="button"
-                          role="switch"
-                          aria-checked={pkg.isActive}
-                          onClick={() => handleToggleStatus(pkg)}
+                        <ToggleSwitch
+                          checked={pkg.isActive}
+                          onChange={() => handleToggleStatus(pkg)}
                           title={pkg.isActive ? "Click to deactivate" : "Click to activate"}
-                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-all duration-200 ease-in-out focus:outline-none ${
-                            pkg.isActive ? "bg-admin-primary" : "bg-white/15 hover:bg-white/20"
-                          }`}
-                          style={
-                            pkg.isActive
-                              ? {
-                                  background: "linear-gradient(135deg, #F472B6 0%, #DB2777 100%)",
-                                  boxShadow: "0 0 10px rgba(244, 114, 182, 0.4)",
-                                }
-                              : {}
-                          }
-                        >
-                          <span
-                            aria-hidden="true"
-                            className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
-                              pkg.isActive ? "translate-x-5" : "translate-x-0"
-                            }`}
-                          />
-                        </button>
+                        />
                       </div>
                     </td>
 

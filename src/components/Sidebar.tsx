@@ -1,20 +1,6 @@
-import {
-  LayoutDashboard,
-  Images,
-  Users,
-  Building2,
-  Coins,
-  Gift,
-  MessageCircleHeart,
-  Headphones,
-  Settings,
-  CircleDollarSign,
-  ChevronLeft,
-  ChevronRight,
-  Share2,
-  Award,
-} from "lucide-react";
+import { MessageCircleHeart, ChevronLeft, ChevronRight } from "lucide-react";
 import { UserAuth } from "../types/homeCarousel.types";
+import { getNavSections } from "./navSections";
 
 interface SidebarProps {
   activeTab: string;
@@ -33,21 +19,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const isSuperAdmin = user?.role === "superAdmin";
 
-  const navItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "home-carousel", label: "Home Carousel", icon: Images },
-    { id: "users", label: "Users", icon: Users },
-    { id: "referrals", label: "Referrals", icon: Share2 },
-    { id: "levels", label: "Levels", icon: Award },
-    ...(isSuperAdmin
-      ? [{ id: "agency", label: "Agency", icon: Building2 }]
-      : []),
-    { id: "customer-service", label: "Customer Service", icon: Headphones },
-    { id: "token-packages", label: "Token Packages", icon: Coins },
-    { id: "redeem-credits", label: "Redeem Credits", icon: CircleDollarSign },
-    { id: "bonus", label: "Bonus", icon: Gift },
-    { id: "settings", label: "Settings", icon: Settings },
-  ];
+  const navSections = getNavSections(isSuperAdmin);
 
   return (
     <aside
@@ -111,46 +83,57 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* ── Navigation Menu Items ── */}
-      <div className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 py-5">
-        {!isCollapsed && (
-          <div className="whitespace-nowrap px-[10px] pb-[10px] text-[0.7rem] font-bold uppercase tracking-[0.08em] text-admin-subtle">
-            Navigation
-          </div>
-        )}
+      <nav className="flex flex-1 flex-col overflow-y-auto px-3 py-4">
+        {navSections.map((section, sectionIndex) => (
+          <div key={section.title} className="flex flex-col gap-1">
+            {/* Section label when open; a thin divider between groups when collapsed */}
+            {isCollapsed ? (
+              sectionIndex > 0 && <div className="mx-auto my-2 h-px w-8 bg-[rgba(244,114,182,0.18)]" />
+            ) : (
+              <div
+                className={`whitespace-nowrap px-[10px] pb-1.5 text-[0.68rem] font-bold uppercase tracking-[0.08em] text-admin-subtle ${
+                  sectionIndex > 0 ? "pt-4" : ""
+                }`}
+              >
+                {section.title}
+              </div>
+            )}
 
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
+            {section.items.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
 
-          return (
-            <button
-              key={item.id}
-              onClick={() => onSelectTab(item.id)}
-              title={isCollapsed ? item.label : undefined}
-              className={`flex w-full items-center whitespace-nowrap rounded-admin text-left text-[0.88rem] transition-all duration-[180ms] ${
-                isCollapsed ? "justify-center px-0 py-[11px]" : "gap-[14px] px-[14px] py-[11px]"
-              } ${
-                isActive
-                  ? "border border-[rgba(244,114,182,0.45)] bg-[rgba(244,114,182,0.16)] font-semibold text-white shadow-[0_0_15px_rgba(244,114,182,0.16)]"
-                  : "border border-transparent font-normal text-admin-muted hover:bg-admin-surface hover:text-white"
-              }`}
-            >
-              <Icon
-                size={18}
-                color={isActive ? "var(--primary)" : "currentColor"}
-                className="shrink-0"
-              />
-              {!isCollapsed && (
-                <span
-                  className={`tracking-[-0.01em] ${isActive ? "text-white" : "inherit"}`}
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => onSelectTab(item.id)}
+                  title={isCollapsed ? item.label : undefined}
+                  className={`flex w-full items-center whitespace-nowrap rounded-admin text-left text-[0.88rem] transition-all duration-[180ms] ${
+                    isCollapsed ? "justify-center px-0 py-[10px]" : "gap-[14px] px-[14px] py-[10px]"
+                  } ${
+                    isActive
+                      ? "border border-[rgba(244,114,182,0.45)] bg-[rgba(244,114,182,0.16)] font-semibold text-white shadow-[0_0_15px_rgba(244,114,182,0.16)]"
+                      : "border border-transparent font-normal text-admin-muted hover:bg-admin-surface hover:text-white"
+                  }`}
                 >
-                  {item.label}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+                  <Icon
+                    size={18}
+                    color={isActive ? "var(--primary)" : "currentColor"}
+                    className="shrink-0"
+                  />
+                  {!isCollapsed && (
+                    <span
+                      className={`tracking-[-0.01em] ${isActive ? "text-white" : "inherit"}`}
+                    >
+                      {item.label}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </nav>
 
       {/* Expand Button for Collapsed Mode at Bottom */}
       {isCollapsed && (
